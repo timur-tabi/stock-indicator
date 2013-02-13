@@ -32,6 +32,7 @@
 # the possibility of such damage.
 
 import sys
+import os
 import gtk
 import urllib
 import urllib2
@@ -77,6 +78,11 @@ class CheckStock:
         self.refresh_item.show()
         self.menu.append(self.refresh_item)
 
+        self.reload_item = gtk.MenuItem('Reload')
+        self.reload_item.connect('activate', self.reload)
+        self.reload_item.show()
+        self.menu.append(self.reload_item)
+
     def main(self):
         self.update_stock_price()
         gtk.timeout_add(PING_FREQUENCY * 60000, self.update_stock_price)
@@ -87,6 +93,11 @@ class CheckStock:
 
     def refresh(self, widget):
         self.update_stock_price()
+
+    def reload(self, widget):
+        # If this script was updated, just reload it instead of forcing the
+        # user to quit first.
+        os.execl(sys.executable, *([sys.executable]+sys.argv))
 
     def update_stock_price(self):
         try:
