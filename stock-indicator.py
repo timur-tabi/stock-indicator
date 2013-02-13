@@ -53,8 +53,6 @@ def wget(url):
 
 class CheckStock:
     symbol = 'FSL'
-    previous_price = 0.0
-    timer = None
 
     def __init__(self):
         self.ind = appindicator.Indicator('new-stock-indicator',
@@ -101,15 +99,15 @@ class CheckStock:
 
     def update_stock_price(self):
         try:
-            data = wget('http://finance.yahoo.com/d/quotes.csv?s=%s&f=l1' % self.symbol)
-            price = float(data.strip())
-            if price > self.previous_price:
+            data = wget('http://finance.yahoo.com/d/quotes.csv?s=%s&f=l1o' % self.symbol)
+            (price, open) = map(float, data.strip().split(','))
+
+            if price > open:
                 self.ind.set_label(u'%s %0.2f \u2191' % (self.symbol, price))
-            elif price < self.previous_price:
+            elif price < open:
                 self.ind.set_label(u'%s %0.2f \u2193' % (self.symbol, price))
             else:
                 self.ind.set_label('%s %0.2f' % (self.symbol, price))
-            self.previous_price = price
         except:
             self.ind.set_label('%s ?' % self.symbol)
 
