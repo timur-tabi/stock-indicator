@@ -99,8 +99,12 @@ class CheckStock:
 
     def update_stock_price(self):
         try:
-            data = wget('http://finance.yahoo.com/d/quotes.csv?s=%s&f=l1o' % self.symbol)
-            (price, open) = map(float, data.strip().split(','))
+            data = wget('http://finance.yahoo.com/d/quotes.csv?s=%s&f=l1o' % self.symbol).strip().split(',')
+            # Before the market opens, the Opening Price is "N/A"
+            if data[1] == 'N/A':
+                price = open = float(data[0])
+            else:
+                (price, open) = map(float, data)
 
             if price > open:
                 self.ind.set_label(u'%s %0.2f \u2191' % (self.symbol, price))
