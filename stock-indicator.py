@@ -66,11 +66,6 @@ class CheckStock:
     def menu_setup(self):
         self.menu = gtk.Menu()
 
-        self.quit_item = gtk.MenuItem('Quit')
-        self.quit_item.connect('activate', self.quit)
-        self.quit_item.show()
-        self.menu.append(self.quit_item)
-
         self.refresh_item = gtk.MenuItem('Refresh')
         self.refresh_item.connect('activate', self.refresh)
         self.refresh_item.show()
@@ -80,6 +75,11 @@ class CheckStock:
         self.reload_item.connect('activate', self.reload)
         self.reload_item.show()
         self.menu.append(self.reload_item)
+
+        self.quit_item = gtk.MenuItem('Quit')
+        self.quit_item.connect('activate', self.quit)
+        self.quit_item.show()
+        self.menu.append(self.quit_item)
 
     def main(self):
         self.update_stock_price()
