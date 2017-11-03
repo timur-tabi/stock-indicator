@@ -38,6 +38,11 @@ import urllib
 import urllib2
 import appindicator
 
+import Image
+import ImageDraw
+import ImageFont
+import tempfile
+
 import imaplib
 import re
 
@@ -55,8 +60,16 @@ class CheckStock:
     symbol = 'QCOM'
 
     def __init__(self):
+        font = ImageFont.truetype('/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-C.ttf', size=64)
+        image = Image.new('RGBA', font.getsize(self.symbol))
+        draw = ImageDraw.Draw(image)
+        # I don't know why, but we need to specify -10 to make sure it's
+        # vertically centered.
+        draw.text((0, -10), self.symbol, font=font)
+        image.save('/tmp/stock.png')
+
         self.ind = appindicator.Indicator('new-stock-indicator',
-                                           '',
+                                           '/tmp/stock.png',
                                            appindicator.CATEGORY_OTHER)
         self.ind.set_status(appindicator.STATUS_ACTIVE)
 
@@ -107,13 +120,15 @@ class CheckStock:
                 (price, open) = map(float, data)
 
             if price > open:
-                self.ind.set_label(u'%s %0.2f \u2191' % (self.symbol, price))
+                # Price has gone up
+                self.ind.set_label(u'%0.2f\u25B3' % price)
             elif price < open:
-                self.ind.set_label(u'%s %0.2f \u2193' % (self.symbol, price))
+                # Price has gone down
+                self.ind.set_label(u'%0.2f\u25BD' % price)
             else:
-                self.ind.set_label('%s %0.2f' % (self.symbol, price))
+                self.ind.set_label('%0.2f' % price)
         except:
-            self.ind.set_label('%s ?' % self.symbol)
+            self.ind.set_label('?')
 
         return True
 
