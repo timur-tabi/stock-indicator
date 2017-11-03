@@ -34,9 +34,9 @@
 import sys
 import os
 import gtk
-import urllib
 import urllib2
 import appindicator
+import json
 
 import Image
 import ImageDraw
@@ -47,14 +47,6 @@ import imaplib
 import re
 
 PING_FREQUENCY = 1 # minutes
-
-def wget(url):
-    try:
-        req = urllib2.Request(url)
-        response = urllib2.urlopen(req)
-        return response.read()
-    except:
-        return None
 
 class CheckStock:
     symbol = 'QCOM'
@@ -112,12 +104,13 @@ class CheckStock:
 
     def update_stock_price(self):
         try:
-            data = wget('http://finance.yahoo.com/d/quotes.csv?s=%s&f=l1o' % self.symbol).strip().split(',')
-            # Before the market opens, the Opening Price is "N/A"
-            if data[1] == 'N/A':
-                price = open = float(data[0])
-            else:
-                (price, open) = map(float, data)
+            url = urllib2.urlopen('https://finance.google.com/finance?q=%s&output=json' % self.symbol)
+            response = url.read()
+            # Google apparently adds 5 bytes at the beginning and 2 bytes at the
+            # end of the JSON that should be ignored.
+            j = json.loads(response[5:len(response) - 2])
+            price = float(j['l'])
+            open = float(j['op'])
 
             if price > open:
                 # Price has gone up
