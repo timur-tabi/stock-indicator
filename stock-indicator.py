@@ -52,7 +52,7 @@ def wget(url):
         return None
 
 class CheckStock:
-    symbol = 'FSL'
+    symbol = 'QCOM'
 
     def __init__(self):
         self.ind = appindicator.Indicator('new-stock-indicator',
